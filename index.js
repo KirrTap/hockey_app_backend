@@ -12,6 +12,23 @@ const pool = new Pool({
     connectionString: 'postgresql://postgres:ZbSIWqZaKDAqCaEsBevyxRruLDqKtRJf@autorack.proxy.rlwy.net:42319/railway',
 });
 
+const getDates = () => {
+  const today = new Date(); // Aktuálny dátum a čas
+  const thirtyDaysLater = new Date(); 
+  thirtyDaysLater.setDate(today.getDate() + 30); // Pridanie 30 dní
+
+  // Pre formátovanie dátumov do formátu 'YYYY-MM-DD HH:MM'
+  const formatDate = (date) => {
+    return date.toISOString().slice(0, 16).replace('T', ' '); // Orež na 'YYYY-MM-DD HH:MM'
+  };
+
+  return {
+    today: formatDate(today),
+    thirtyDaysLater: formatDate(thirtyDaysLater),
+  };
+};
+
+
 // // API endpoint na zapisovanie textu do databázy
 // app.post('/api/text', async (req, res) => {
 //   const { text } = req.body;
@@ -27,13 +44,30 @@ const pool = new Pool({
 //   }
 // });
 
-app.get('/api/kolo1', async (req, res) => {
+// app.get('/api/kolo1', async (req, res) => {
+//   try {
+//     const result = await pool.query('SELECT hometeam, awayteam FROM matches WHERE kolo = $1', ['kolo1']);
+//     res.json(result.rows); // Vráti záznamy z databázy
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Chyba pri získavaní údajov z databázy' });
+//   }
+// });
+
+app.get('/matches', async (req, res) => {
+  const { today, thirtyDaysLater } = getDates();
+
   try {
-    const result = await pool.query('SELECT hometeam, awayteam FROM matches WHERE kolo = $1', ['kolo1']);
-    res.json(result.rows); // Vráti záznamy z databázy
+    const query = `
+      SELECT * FROM matches
+      WHERE match_date BETWEEN $1 AND $2
+    `;
+    const result = await pool.query(query, [today, thirtyDaysLater]);
+
+    res.json(result.rows); // Vrátenie zoznamu zápasov ako JSON
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Chyba pri získavaní údajov z databázy' });
+    console.error('Chyba pri získavaní zápasov:', error);
+    res.status(500).json({ error: 'Chyba pri získavaní zápasov' });
   }
 });
 
