@@ -58,7 +58,7 @@ app.get('/matches', async (req, res) => {
   const { today, thirtyDaysLater } = getDates();
 
   try {
-    const result = await pool.query(`SELECT * FROM matches WHERE match_date BETWEEN $1 AND $2`, [today, thirtyDaysLater]);
+    const result = await pool.query(`SELECT * FROM matches WHERE datum BETWEEN $1 AND $2`, [today, thirtyDaysLater]);
     res.json(result.rows);
   } catch (error) {
     console.error('Chyba pri získavaní zápasov:', error);
