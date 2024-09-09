@@ -19,7 +19,7 @@ const getDates = () => {
 
   // Pre formátovanie dátumov do formátu 'YYYY-MM-DD HH:MM'
   const formatDate = (date) => {
-    return date.toISOString().slice(0, 16).replace('T', ' '); // Orež na 'YYYY-MM-DD HH:MM'
+    return date.toISOString().slice(0, 19).replace('T', ' '); // Orež na 'YYYY-MM-DD HH:MM'
   };
 
   return {
@@ -58,16 +58,11 @@ app.get('/matches', async (req, res) => {
   const { today, thirtyDaysLater } = getDates();
 
   try {
-    const query = `
-      SELECT * FROM matches
-      WHERE match_date BETWEEN $1 AND $2
-    `;
-    const result = await pool.query(query, [today, thirtyDaysLater]);
-
-    res.json(result.rows); // Vrátenie zoznamu zápasov ako JSON
+    const result = await pool.query(`SELECT * FROM matches WHERE match_date BETWEEN $1 AND $2`, [today, thirtyDaysLater]);
+    res.json(result.rows);
   } catch (error) {
     console.error('Chyba pri získavaní zápasov:', error);
-    res.status(500).json({ error: 'Chyba pri získavaní zápasov' });
+    res.status(500).json({ error: 'Chyba pri získavaní údajov z databázy' });
   }
 });
 
