@@ -19,7 +19,7 @@ const getDates = () => {
 
   // Pre formátovanie dátumov do formátu 'YYYY-MM-DD HH:MM'
   const formatDate = (date) => {
-    return date.toISOString().slice(0, 19).replace('T', ' '); // Orež na 'YYYY-MM-DD HH:MM'
+    return date.toISOString().slice(0, 16).replace('T', ' '); // Orež na 'YYYY-MM-DD HH:MM'
   };
 
   return {
