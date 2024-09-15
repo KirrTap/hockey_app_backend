@@ -57,6 +57,7 @@ app.post('/save-match-result', async(req, res) => {
         `UPDATE matches SET homegoals = $1, awaygoals = $2 WHERE id = $3 RETURNING *`,
         [homeScore, awayScore, matchId]
       );
+      res.json(newText.rows[0]);
     } catch (error) {
       console.error('Chyba pri ukladaní výsledku zápasu:', error);
       res.status(500).json({ error: 'Chyba pri ukladaní výsledku zápasu' });
