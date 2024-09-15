@@ -3,9 +3,8 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const app = express();
 
-// Middleware
 app.use(cors());
-app.use(express.json()); // Na spracovanie JSON dát
+app.use(express.json()); 
 
 // Pripojenie k PostgreSQL
 const pool = new Pool({
@@ -13,9 +12,9 @@ const pool = new Pool({
 });
 
 const getDates = () => {
-  const today = new Date(); // Aktuálny dátum a čas
+  const today = new Date(); 
   const thirtyDaysLater = new Date(); 
-  thirtyDaysLater.setDate(today.getDate() + 30); // Pridanie 30 dní
+  thirtyDaysLater.setDate(today.getDate() + 30);
 
   return {
     today, thirtyDaysLater
@@ -51,6 +50,18 @@ app.get('/matches', async (req, res) => {
   }
 });
 
+app.post('/save-match-result', async(req, res) => {
+  const { matchId, homeScore, awayScore } = req.body;
+    try {
+      const result = await pool.query(
+        `UPDATE matches SET homegoals = $1, awaygoals = $2 WHERE id = $3 RETURNING *`,
+        [homeScore, awayScore, matchId]
+      );
+    } catch (error) {
+      console.error('Chyba pri ukladaní výsledku zápasu:', error);
+      res.status(500).json({ error: 'Chyba pri ukladaní výsledku zápasu' });
+    }   
+});
 
 // Štart servera
 const PORT = process.env.PORT || 5000;
