@@ -52,6 +52,9 @@ app.get('/matches', async (req, res) => {
 
 app.post('/save-match-result', async(req, res) => {
   const { matchId, homeScore, awayScore } = req.body;
+  if (homeScore === undefined || awayScore === undefined || homeScore === '' || awayScore === '') {
+    return res.status(400).json({ error: 'Zadajte góly pre domáci a hosťujúci tím.' });
+  }
     try {
       const result = await pool.query(
         `UPDATE matches SET homegoals = $1, awaygoals = $2 WHERE id = $3 RETURNING *`,
